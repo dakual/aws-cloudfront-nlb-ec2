@@ -86,46 +86,46 @@ resource "aws_security_group" "main" {
   }
 }
 
-# resource "aws_eip" "nat" {
-#   count = length(local.private_subnets)
-#   vpc   = true
+resource "aws_eip" "nat" {
+  count = length(local.private_subnets)
+  vpc   = true
 
-#   tags = {
-#     Name        = "${local.name}-eip-${format("%03d", count.index+1)}"
-#     Environment = local.environment
-#   }
-# }
+  tags = {
+    Name        = "${local.name}-eip-${format("%03d", count.index+1)}"
+    Environment = local.environment
+  }
+}
 
-# resource "aws_nat_gateway" "main" {
-#   count         = length(local.private_subnets)
+resource "aws_nat_gateway" "main" {
+  count         = length(local.private_subnets)
 
-#   allocation_id = element(aws_eip.nat.*.id, count.index)
-#   subnet_id     = element(aws_subnet.public.*.id, count.index)
-#   depends_on    = [aws_internet_gateway.main]
+  allocation_id = element(aws_eip.nat.*.id, count.index)
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
+  depends_on    = [aws_internet_gateway.main]
 
-#   tags = {
-#     Name        = "${local.name}-nat-${format("%03d", count.index+1)}"
-#     Environment = local.environment
-#   }
-# }
+  tags = {
+    Name        = "${local.name}-nat-${format("%03d", count.index+1)}"
+    Environment = local.environment
+  }
+}
 
-# resource "aws_route_table" "private" {
-#   count  = length(local.private_subnets)
-#   vpc_id = aws_vpc.main.id
+resource "aws_route_table" "private" {
+  count  = length(local.private_subnets)
+  vpc_id = aws_vpc.main.id
 
-#   route {
-#     cidr_block     = "0.0.0.0/0"
-#     nat_gateway_id = element(aws_nat_gateway.main.*.id, count.index)
-#   }
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = element(aws_nat_gateway.main.*.id, count.index)
+  }
 
-#   tags = {
-#     Name        = "${local.name}-routing-table-private-${format("%03d", count.index+1)}"
-#     Environment = local.environment
-#   }
-# }
+  tags = {
+    Name        = "${local.name}-routing-table-private-${format("%03d", count.index+1)}"
+    Environment = local.environment
+  }
+}
 
-# resource "aws_route_table_association" "private" {
-#   count          = length(local.private_subnets)
-#   subnet_id      = element(aws_subnet.private.*.id, count.index)
-#   route_table_id = element(aws_route_table.private.*.id, count.index)
-# }
+resource "aws_route_table_association" "private" {
+  count          = length(local.private_subnets)
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  route_table_id = element(aws_route_table.private.*.id, count.index)
+}
