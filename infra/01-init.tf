@@ -5,6 +5,15 @@ terraform {
       version = "~> 4.38.0"
     }
   }
+
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "dakual"
+
+    workspaces {
+      name = "aws-cloudfront-nlb-ec2"
+    }
+  }
 }
 
 provider "aws" {
