@@ -11,7 +11,7 @@ resource "aws_instance" "main" {
   connection {
     type        = "ssh"
     user        = "admin"
-    private_key = file("~/.aws/pems/mykey.pem")
+    private_key = file(local.key_path)
     host        = self.public_ip
   }
 
